@@ -32,9 +32,14 @@ class YoutubeProcessor extends Youtube {
     this.ffmpegPath = prefs.ffmpegPath
     this.tmpOutputPath = prefs.tmpOutputPath
     this.maxYouTubeProcesses = prefs.maxYouTubeProcesses * 1
+    this.youtubeCookies = prefs.youtubeCookies
 
     if (this.maxYouTubeProcesses < 1) {
       this.maxYouTubeProcesses = 1
+    }
+
+    if (!this.youtubeCookies) {
+      log.warn('No YouTube cookies provided; downloads may fail')
     }
   }
 
@@ -137,11 +142,12 @@ class YoutubeProcessor extends Youtube {
 
       // download the audio and video separately at the same time...
       log.info('Downloading video #' + video.id + '...')
+      const requestOptions = this.youtubeCookies ? { requestOptions: { headers: { cookie: this.youtubeCookies } } } : {}
       try {
         await Promise.all([
-          shell.promisifiedPipe(ytdl(video.url, { quality: 'highestaudio', filter:'audioonly' }),
+          shell.promisifiedPipe(ytdl(video.url, { quality: 'highestaudio', filter: 'audioonly', ...requestOptions }),
             fs.createWriteStream(outputDir + '/audio.mp3')),
-          shell.promisifiedPipe(ytdl(video.url, { quality: 'highestvideo', filter:'videoonly' }),
+          shell.promisifiedPipe(ytdl(video.url, { quality: 'highestvideo', filter: 'videoonly', ...requestOptions }),
             fs.createWriteStream(outputDir + '/video.mp4'))
         ])
       } catch (e) {
@@ -154,7 +160,7 @@ class YoutubeProcessor extends Youtube {
         fs.unlinkSync(outputDir + '/video.mp4')
 
         // download a combined audio/video file...
-        await shell.promisifiedPipe(ytdl(video.url, { quality: 'highest', filter:'audioandvideo' }),
+        await shell.promisifiedPipe(ytdl(video.url, { quality: 'highest', filter: 'audioandvideo', ...requestOptions }),
           fs.createWriteStream(outputDir + '/combined.mp4'))
 
         // ensure we got the combined file...

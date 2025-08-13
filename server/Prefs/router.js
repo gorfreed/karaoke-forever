@@ -1,4 +1,5 @@
 const path = require('path')
+const fs = require('fs')
 const axios = require('axios')
 const log = require('../lib/Log').getLogger('Prefs')
 const KoaRouter = require('koa-router')
@@ -38,6 +39,29 @@ router.get('/', async (ctx, next) => {
   } else {
     ctx.body = prefs
   }
+})
+
+// upload youtube cookies
+router.post('/youtubeCookies', async (ctx, next) => {
+  if (!ctx.user.isAdmin) {
+    ctx.throw(401)
+  }
+
+  if (!ctx.request.files || !ctx.request.files.cookies) {
+    ctx.throw(400, 'No cookie file uploaded')
+  }
+
+  const file = ctx.request.files.cookies
+  const stats = fs.statSync(file.path)
+  if (stats.size > 50000) {
+    await fs.promises.unlink(file.path)
+    ctx.throw(413, 'Cookie file too large')
+  }
+  const data = await fs.promises.readFile(file.path, 'utf8')
+  await fs.promises.unlink(file.path)
+  await Prefs.set('youtubeCookies', data.trim())
+
+  ctx.body = await Prefs.get()
 })
 
 // add media file path

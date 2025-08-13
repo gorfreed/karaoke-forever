@@ -10,7 +10,7 @@ You're looking at gazugafan's fork of Karaoke Forever, which includes the follow
 
 ## Getting started with the fork
 
-At a minimum, you'll need [Node.js](https://nodejs.org/en/) 12 or later and [FFMPEG](https://www.ffmpeg.org) installed. That's enough to download pre-made karaoke mixes from YouTube. Automatic karaoke mix generation requires a bit more technical setup.
+At a minimum, you'll need [Node.js](https://nodejs.org/en/) 12 or later and [FFMPEG](https://www.ffmpeg.org) installed. You'll also need to export cookies from a logged-in YouTube account so downloads can be authenticated. Automatic karaoke mix generation requires a bit more technical setup.
 
 This fork doesn't have any "release" on github. There's no single executable to download. Instead, you'll need to get the entire codebase. You can do that by clicking the "Code" button in the upper-right of github (probably on this page).
 
@@ -22,7 +22,7 @@ Congrats! My fork of Karaoke Forever should now be running. You should be able t
 
 ## Enabling YouTube Search
 
-With my fork running, login with your admin account, switch to the Account tab, and check the box under the YouTube preferences. You'll need FFMPEG installed. See https://github.com/gazugafan/karaoke-forever/blob/main/docs/content/docs/index.md#youtube-setup for more details.
+With my fork running, login with your admin account, switch to the Account tab, and check the box under the YouTube preferences. You'll need FFMPEG installed and a cookies.txt file from your YouTube account uploaded in this panel. See https://github.com/gazugafan/karaoke-forever/blob/main/docs/content/docs/index.md#youtube-setup for more details.
 
 ## Automatic vocals removal and lyric alignment
 
