@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Icon from 'components/Icon'
-import { setPref } from 'store/modules/prefs'
+import { setPref, receivePrefs } from 'store/modules/prefs'
 import styles from './YouTubePrefs.css'
 import HttpApi from 'lib/HttpApi'
 
@@ -19,12 +19,15 @@ const YouTubePrefs = props => {
   const upcomingLyricsColor = useSelector(state => state.prefs.upcomingLyricsColor)
   const playedLyricsColor = useSelector(state => state.prefs.playedLyricsColor)
   const maxYouTubeProcesses = useSelector(state => state.prefs.maxYouTubeProcesses)
+  const youtubeCookies = useSelector(state => state.prefs.youtubeCookies)
   const [testingSpleeter, setTestingSpleeter] = useState(false)
   const [spleeterResult, setSpleeterResult] = useState(null)
   const [testingAutoLyrix, setTestingAutoLyrix] = useState(false)
   const [autoLyrixResult, setAutoLyrixResult] = useState(null)
   const [testingFfmpeg, setTestingFfmpeg] = useState(false)
   const [ffmpegResult, setFfmpegResult] = useState(null)
+  const [cookieFile, setCookieFile] = useState(null)
+  const [cookieResult, setCookieResult] = useState(null)
 
   const toggleExpanded = useCallback(() => {
     setExpanded(!isExpanded)
@@ -37,6 +40,23 @@ const YouTubePrefs = props => {
   const updateTextbox = useCallback((e) => {
     dispatch(setPref(e.target.name, e.target.value))
   }, [dispatch])
+  const onCookieChange = useCallback((e) => {
+    setCookieFile(e.target.files[0])
+  }, [])
+  const uploadCookies = useCallback(() => {
+    if (!cookieFile) return
+    setCookieResult(null)
+    const form = new FormData()
+    form.append('cookies', cookieFile)
+    api('POST', '/youtubeCookies', { body: form })
+      .then((prefs) => {
+        dispatch(receivePrefs(prefs))
+        setCookieResult({ success: true })
+      })
+      .catch((err) => {
+        setCookieResult({ success: false, message: err.message })
+      })
+  }, [cookieFile, dispatch])
 
   const testSpleeter = () => {
     setTestingSpleeter(true)
@@ -118,6 +138,18 @@ const YouTubePrefs = props => {
           {testingFfmpeg && (<div>Testing FFMPEG...</div>)}
           {ffmpegResult !== null && ffmpegResult.success && <div className={styles.testSuccess}>{ffmpegResult.message}</div>}
           {ffmpegResult !== null && !ffmpegResult.success && <div className={styles.testFailed}>{ffmpegResult.message}</div>}
+        </div>
+
+        <div className={styles.content} style={{ display: isYouTubeEnabled ? 'block' : 'none' }}>
+          <label>
+            YouTube Cookies
+            <input type='file' accept='.txt' onChange={onCookieChange} />
+          </label>
+          <button onClick={uploadCookies} disabled={!cookieFile}>Upload</button>
+          {cookieResult && cookieResult.success && <div className={styles.testSuccess}>Cookies uploaded</div>}
+          {cookieResult && !cookieResult.success && <div className={styles.testFailed}>{cookieResult.message}</div>}
+          {!youtubeCookies && !cookieResult && <div className={styles.tip}>Export cookies from your browser and upload them.</div>}
+          {youtubeCookies && !cookieResult && <div className={styles.tip}>Cookies currently set.</div>}
         </div>
 
         <div className={styles.content} style={{ display: isYouTubeEnabled ? 'block' : 'none' }}>

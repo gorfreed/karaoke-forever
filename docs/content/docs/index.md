@@ -222,6 +222,8 @@ To enable YouTube search, login to the webapp with your admin account. Then, swi
 
 If FFMPEG isn't in your global PATH, fill in the full path to the executable. Then tap "Test FFMPEG" to make sure it's working.
 
+YouTube now requires authenticated requests to download videos. Use your browser or `yt-dlp --cookies-from-browser` to export your YouTube cookies and upload the resulting file in this preferences panel.
+
 Congrats! Now users can search YouTube for pre-made karaoke mixes.
 
 #### Automatic vocals removal and lyric alignment

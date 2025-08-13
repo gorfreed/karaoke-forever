@@ -40,6 +40,7 @@ class Prefs {
       playedLyricsColor: '#d9a000',
       tmpOutputPath: 'tmp',
       maxYouTubeProcesses: 3,
+      youtubeCookies: '',
     }
 
     const prefs = {
